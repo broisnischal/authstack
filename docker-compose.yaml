@@ -1,0 +1,41 @@
+version: "3"
+services:
+  api:
+    image: node:latest
+    container_name: api
+    volumes:
+      - ./api:/api
+      - ./node_modules:/node_modules
+      - ./shared:/shared
+      - ./tsconfig.json:/tsconfig.json
+      - ./package.json:/package.json
+    ports:
+      - "3001:3000"
+    working_dir: /
+    command: yarn run ts-node-dev --project api/tsconfig.json -r tsconfig-paths/register api/index.ts
+    env_file: .env
+    depends_on:
+      - mongodb
+
+  client:
+    image: node:latest
+    container_name: client
+    volumes:
+      - ./client:/client
+      - ./node_modules:/node_modules
+      - ./shared:/shared
+      - ./tsconfig.json:/tsconfig.json
+      - ./package.json:/package.json
+    ports:
+      - "3000:3000"
+    working_dir: /client
+    command: yarn run dev
+
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
